@@ -1,0 +1,133 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'usersCount' => \App\Models\User::where('role', 'user')->count(),
+        'features' => \App\Models\Feature::orderBy('order')->get(),
+        'services' => \App\Models\Service::orderBy('order')->get(),
+        'partners' => \App\Models\Partner::orderBy('order')->get(),
+        'testimonials' => \App\Models\Testimonial::where('is_hidden', false)
+            ->when(\App\Models\Setting::where('key', 'testimonial_mode')->value('value') === 'manual', function ($query) {
+                return $query->where('is_featured', true);
+            })
+            ->latest()
+            ->take(8)
+            ->get(),
+    ]);
+})->name('home');
+
+Route::get('/testimoni', function () {
+    return Inertia::render('Testimoni/Index', [
+        'testimonials' => \App\Models\Testimonial::where('is_hidden', false)->latest()->get(),
+    ]);
+})->name('testimoni');
+
+Route::post('/testimoni', [\App\Http\Controllers\TestimonialController::class, 'storePublic'])->name('testimoni.store')->middleware('auth');
+
+Route::get('/tes-karir', [\App\Http\Controllers\RiasecTestController::class, 'index'])->name('tes-karir.index');
+
+Route::get('/modul', [\App\Http\Controllers\ModulController::class, 'index'])->name('modul');
+Route::get('/modul/{id}', [\App\Http\Controllers\ModulController::class, 'show'])->name('modul.show');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/tes-karir/kerjakan', [\App\Http\Controllers\RiasecTestController::class, 'create'])->name('tes-karir.create');
+    Route::post('/tes-karir/kerjakan', [\App\Http\Controllers\RiasecTestController::class, 'store'])->name('tes-karir.store');
+    Route::get('/tes-karir/hasil/{result}', [\App\Http\Controllers\RiasecTestController::class, 'show'])->name('tes-karir.result');
+});
+
+Route::get('/tim-kami', function () {
+    return Inertia::render('TimKami/Index', [
+        'teamMembers' => \App\Models\TeamMember::where('is_active', true)->get()
+    ]);
+})->name('tim-kami');
+
+Route::get('/panduan', function () {
+    return Inertia::render('Panduan/Index');
+})->name('panduan');
+
+Route::get('/konseling', function () {
+    return Inertia::render('Konseling/Index');
+})->name('konseling');
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Admin/Dashboard/Index', [
+            'stats' => [
+                'users_count' => \App\Models\User::where('role', 'user')->count(),
+                'admins_count' => \App\Models\User::where('role', 'admin')->count(),
+                'riasec_tests_count' => \App\Models\RiasecTestResult::count(),
+                'modules_count' => \App\Models\Module::count(),
+            ]
+        ]);
+    })->name('dashboard');
+
+    // Pengaturan yang bisa diakses oleh admin dan superadmin
+    Route::get('/counseling-settings', [\App\Http\Controllers\Admin\SettingController::class, 'counseling'])->name('counseling-settings.index');
+    Route::post('/counseling-settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('counseling-settings.update');
+
+    Route::middleware('superadmin')->group(function () {
+        Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+
+        Route::post('features/reorder', [\App\Http\Controllers\FeatureController::class, 'reorder'])->name('features.reorder');
+        Route::resource('features', \App\Http\Controllers\FeatureController::class)->except(['create', 'show', 'edit']);
+        Route::post('services/reorder', [\App\Http\Controllers\ServiceController::class, 'reorder'])->name('services.reorder');
+        Route::resource('services', \App\Http\Controllers\ServiceController::class)->except(['create', 'show', 'edit']);
+        
+        Route::get('/riasec/categories', [\App\Http\Controllers\Admin\RiasecCategoryController::class, 'index'])->name('riasec.categories.index');
+        Route::put('/riasec/categories/{code}', [\App\Http\Controllers\Admin\RiasecCategoryController::class, 'update'])->name('riasec.categories.update');
+
+        Route::resource('riasec/questions', \App\Http\Controllers\Admin\RiasecQuestionController::class, ['as' => 'riasec'])->except(['create', 'show', 'edit']);
+    });
+
+    Route::post('team-members/bulk', [\App\Http\Controllers\Admin\TeamMemberController::class, 'bulkAction'])->name('team-members.bulk');
+    Route::resource('team-members', \App\Http\Controllers\Admin\TeamMemberController::class)->except(['create', 'show', 'edit']);
+
+    // RIASEC Routes
+    Route::get('/riasec/results', [\App\Http\Controllers\Admin\RiasecTestResultsController::class, 'index'])->name('riasec.results.index');
+    Route::get('/riasec/results/export', [\App\Http\Controllers\Admin\RiasecTestResultsController::class, 'export'])->name('riasec.results.export');
+
+    // CMS Routes
+    Route::post('partners/reorder', [\App\Http\Controllers\PartnerController::class, 'reorder'])->name('partners.reorder');
+    Route::post('partners/bulk', [\App\Http\Controllers\PartnerController::class, 'bulkAction'])->name('partners.bulk');
+    Route::resource('partners', \App\Http\Controllers\PartnerController::class)->except(['create', 'show', 'edit']);
+    
+    Route::post('testimonials/bulk', [\App\Http\Controllers\TestimonialController::class, 'bulkAction'])->name('testimonials.bulk');
+    Route::resource('testimonials', \App\Http\Controllers\TestimonialController::class)->except(['create', 'show', 'edit']);
+    
+    Route::post('users/bulk', [\App\Http\Controllers\Admin\UserController::class, 'bulkAction'])->name('users.bulk');
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'store', 'destroy']);
+    
+    Route::resource('modules', \App\Http\Controllers\Admin\ModuleController::class)->except(['create', 'edit']);
+    Route::post('modules/reorder', [\App\Http\Controllers\Admin\ModuleController::class, 'reorder'])->name('modules.reorder');
+    
+    Route::post('modules/{module}/topics', [\App\Http\Controllers\Admin\ModuleTopicController::class, 'store'])->name('topics.store');
+    Route::put('topics/{topic}', [\App\Http\Controllers\Admin\ModuleTopicController::class, 'update'])->name('topics.update');
+    Route::delete('topics/{topic}', [\App\Http\Controllers\Admin\ModuleTopicController::class, 'destroy'])->name('topics.destroy');
+    Route::post('modules/{module}/topics/reorder', [\App\Http\Controllers\Admin\ModuleTopicController::class, 'reorder'])->name('topics.reorder');
+    
+    Route::get('topics/{topic}/contents', [\App\Http\Controllers\Admin\TopicContentController::class, 'index'])->name('topic-contents.index');
+    Route::post('topics/{topic}/contents', [\App\Http\Controllers\Admin\TopicContentController::class, 'store'])->name('topic-contents.store');
+    Route::post('contents/{content}', [\App\Http\Controllers\Admin\TopicContentController::class, 'update'])->name('topic-contents.update'); // Using POST for file uploads
+    Route::delete('contents/{content}', [\App\Http\Controllers\Admin\TopicContentController::class, 'destroy'])->name('topic-contents.destroy');
+    Route::post('topics/{topic}/contents/reorder', [\App\Http\Controllers\Admin\TopicContentController::class, 'reorder'])->name('topic-contents.reorder');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';

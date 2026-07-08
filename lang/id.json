@@ -1,0 +1,7 @@
+{
+    "The email field is required.": "Kolom email wajib diisi.",
+    "The password field is required.": "Kolom password wajib diisi.",
+    "The password field must be at least 8 characters.": "Password minimal harus 8 karakter.",
+    "The password field confirmation does not match.": "Konfirmasi password tidak cocok.",
+    "These credentials do not match our records.": "Email atau password yang Anda masukkan salah."
+}
