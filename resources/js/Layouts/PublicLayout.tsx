@@ -118,8 +118,8 @@ export default function PublicLayout({ children, transparentNavbar = false }: Pu
                 </div>
 
                 {/* Mobile Menu Content */}
-                <div className={`md:hidden absolute top-full left-0 right-0 bg-brand-dark/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
-                    isMobileMenuOpen ? 'max-h-[500px] py-4' : 'max-h-0 py-0 border-transparent'
+                <div className={`md:hidden absolute top-full left-0 right-0 bg-brand-dark/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-all duration-300 ${
+                    isMobileMenuOpen ? 'max-h-[85vh] overflow-y-auto py-4' : 'max-h-0 overflow-hidden py-0 border-transparent'
                 }`}>
                     <div className="flex flex-col px-6 space-y-4 text-center">
                         <Link href={route('home')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Home</Link>
