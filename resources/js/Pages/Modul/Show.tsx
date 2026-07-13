@@ -185,7 +185,7 @@ export default function ModulShow({ module }: Props) {
 
                             {module.hashtag && (
                                 <div className="inline-block px-3 py-1 bg-brand-primary/10 text-brand-primary text-sm font-bold rounded-full mb-6">
-                                    {module.hashtag}
+                                    {module.hashtag.replace(/^#+/, '')}
                                 </div>
                             )}
 

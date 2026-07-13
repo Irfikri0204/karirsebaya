@@ -93,4 +93,20 @@ class RiasecTestResultsController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function bulkAction(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:riasec_test_results,id',
+            'action' => 'required|in:delete'
+        ]);
+
+        if ($validated['action'] === 'delete') {
+            RiasecTestResult::whereIn('id', $validated['ids'])->delete();
+            return redirect()->back()->with('success', 'Data hasil tes yang dipilih berhasil dihapus.');
+        }
+
+        return redirect()->back();
+    }
 }

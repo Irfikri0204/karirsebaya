@@ -102,7 +102,7 @@ export default function RiasecQuestionsIndex({ questions, categories }: Props) {
         <AdminLayout header="Bank Soal RIASEC">
             <Head title="Bank Soal RIASEC - Admin Karir Sebaya" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Daftar Pertanyaan</h2>
                     <p className="text-sm text-gray-500">Kelola instrumen tes untuk pemetaan minat dan bakat.</p>
@@ -117,8 +117,9 @@ export default function RiasecQuestionsIndex({ questions, categories }: Props) {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left text-sm text-gray-600">
-                    <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+                <div className="overflow-x-auto w-full overflow-y-hidden border-t border-gray-100">
+                    <table className="w-full text-left text-sm text-gray-600 min-w-[800px]">
+                        <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
                         <tr>
                             <th className="px-6 py-4 w-16">ID</th>
                             <th className="px-6 py-4 w-24">Tipe</th>
@@ -156,8 +157,9 @@ export default function RiasecQuestionsIndex({ questions, categories }: Props) {
                                 </td>
                             </tr>
                         )}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Modal */}
@@ -274,3 +276,4 @@ export default function RiasecQuestionsIndex({ questions, categories }: Props) {
         </AdminLayout>
     );
 }
+

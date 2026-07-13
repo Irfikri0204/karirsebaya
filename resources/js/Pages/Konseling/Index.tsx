@@ -93,10 +93,10 @@ export default function Konseling() {
                                         href={waLink} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="w-full flex items-center justify-center gap-3 py-4 rounded-full bg-green-500 hover:bg-green-600 text-white font-bold transition-all shadow-lg shadow-green-500/20"
+                                        className="w-full flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 rounded-full bg-green-500 hover:bg-green-600 text-white font-bold transition-all shadow-lg shadow-green-500/20 text-sm sm:text-base text-center"
                                     >
-                                        <i className="ph-fill ph-whatsapp-logo text-2xl"></i>
-                                        Hubungi Kami via WhatsApp
+                                        <i className="ph-fill ph-whatsapp-logo text-xl sm:text-2xl"></i>
+                                        <span>Hubungi Kami via WhatsApp</span>
                                     </a>
                                 </div>
                             </div>

@@ -32,6 +32,7 @@ export default function TopicContentsIndex({ topic, contents }: Props) {
     const [isCreateTextModalOpen, setIsCreateTextModalOpen] = useState(false);
     const [isCreateImageModalOpen, setIsCreateImageModalOpen] = useState(false);
     const [editingContent, setEditingContent] = useState<TopicContent | null>(null);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const { data: textData, setData: setTextData, post: postText, processing: processingText, errors: errorsText, reset: resetText, clearErrors: clearErrorsText } = useForm({
         type: 'text',
@@ -143,6 +144,34 @@ export default function TopicContentsIndex({ topic, contents }: Props) {
         }
     };
 
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(contents.map(c => c.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelect = (id: number) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.length === 0) return;
+        if (confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.length} konten yang dipilih?`)) {
+            router.post(route('admin.topic-contents.bulk', topic.id), {
+                ids: selectedIds,
+                action: 'delete'
+            }, {
+                onSuccess: () => setSelectedIds([])
+            });
+        }
+    };
+
     // Quill Toolbar Configuration
     const quillModules = {
         toolbar: [
@@ -158,7 +187,7 @@ export default function TopicContentsIndex({ topic, contents }: Props) {
         <AdminLayout header="Kelola Konten Topik">
             <Head title={`Konten Topik: ${topic.title} - Admin Karir Sebaya`} />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div className="flex items-center gap-4">
                     <Link href={route('admin.modules.show', topic.module?.id)} className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-brand-primary hover:border-brand-primary transition-colors">
                         <i className="ph ph-arrow-left text-xl"></i>
@@ -168,7 +197,16 @@ export default function TopicContentsIndex({ topic, contents }: Props) {
                         <p className="text-sm text-gray-500">Kelola susunan teks dan gambar pada topik ini.</p>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                    {selectedIds.length > 0 && (
+                        <button 
+                            onClick={handleBulkDelete}
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2"
+                        >
+                            <i className="ph ph-trash text-lg"></i>
+                            Hapus Terpilih ({selectedIds.length})
+                        </button>
+                    )}
                     <button 
                         onClick={openCreateTextModal}
                         className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-bold transition-all flex items-center gap-2"
@@ -188,10 +226,32 @@ export default function TopicContentsIndex({ topic, contents }: Props) {
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <div className="space-y-4">
+                    {contents.length > 0 && (
+                        <div className="flex items-center gap-2 px-2 pb-2 mb-2 border-b border-gray-100">
+                            <input 
+                                type="checkbox" 
+                                className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                checked={contents.length > 0 && selectedIds.length === contents.length}
+                                onChange={handleSelectAll}
+                                id="selectAllContents"
+                            />
+                            <label htmlFor="selectAllContents" className="text-sm font-bold text-gray-600 cursor-pointer">
+                                Pilih Semua Konten
+                            </label>
+                        </div>
+                    )}
                     {contents.length > 0 ? (
                         contents.map((content, index) => (
-                            <div key={content.id} className="flex gap-4 p-4 border border-gray-100 bg-gray-50/50 rounded-xl hover:shadow-sm transition-all group">
-                                <div className="flex flex-col items-center gap-1 mt-2">
+                            <div key={content.id} className="flex gap-4 p-4 border border-gray-100 bg-gray-50/50 rounded-xl hover:shadow-sm transition-all group items-start">
+                                <div className="mt-2 flex items-center justify-center">
+                                    <input 
+                                        type="checkbox" 
+                                        className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                        checked={selectedIds.includes(content.id)}
+                                        onChange={() => handleSelect(content.id)}
+                                    />
+                                </div>
+                                <div className="flex flex-col items-center gap-1 mt-0">
                                     <button 
                                         onClick={() => moveItem(index, 'up')}
                                         disabled={index === 0}
@@ -344,3 +404,5 @@ export default function TopicContentsIndex({ topic, contents }: Props) {
         </AdminLayout>
     );
 }
+
+

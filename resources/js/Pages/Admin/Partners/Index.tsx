@@ -18,11 +18,13 @@ export default function PartnersIndex({ partners }: Props) {
     const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
     const [localPartners, setLocalPartners] = useState<Partner[]>([]);
     const [isOrderChanged, setIsOrderChanged] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         setLocalPartners([...partners].sort((a, b) => a.order - b.order));
         setIsOrderChanged(false);
+        setSelectedIds([]);
     }, [partners]);
 
     const { data, setData, post, processing, reset, errors } = useForm({
@@ -110,16 +112,53 @@ export default function PartnersIndex({ partners }: Props) {
         });
     };
 
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(localPartners.map(p => p.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelect = (id: number) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.length === 0) return;
+        if (confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.length} institusi mitra yang dipilih?`)) {
+            router.post(route('admin.partners.bulk'), {
+                ids: selectedIds,
+                action: 'delete'
+            }, {
+                onSuccess: () => setSelectedIds([])
+            });
+        }
+    };
+
     return (
         <AdminLayout header="Kelola Institusi Mitra">
             <Head title="Mitra - Admin Karir Sebaya" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Daftar Institusi Mitra</h2>
                     <p className="text-sm text-gray-500">Atur "Dipercaya oleh Institusi Terkemuka" di halaman Beranda.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                    {selectedIds.length > 0 && (
+                        <button 
+                            onClick={handleBulkDelete}
+                            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2"
+                        >
+                            <i className="ph ph-trash text-lg"></i>
+                            Hapus Terpilih ({selectedIds.length})
+                        </button>
+                    )}
                     {isOrderChanged && (
                         <button 
                             onClick={saveOrder}
@@ -140,9 +179,18 @@ export default function PartnersIndex({ partners }: Props) {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left text-sm text-gray-600">
-                    <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+                <div className="overflow-x-auto w-full overflow-y-hidden border-t border-gray-100">
+                    <table className="w-full text-left text-sm text-gray-600 min-w-[800px]">
+                        <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
                         <tr>
+                            <th className="px-6 py-4 w-12 text-center">
+                                <input 
+                                    type="checkbox" 
+                                    className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                    checked={localPartners.length > 0 && selectedIds.length === localPartners.length}
+                                    onChange={handleSelectAll}
+                                />
+                            </th>
                             <th className="px-6 py-4">Urutan</th>
                             <th className="px-6 py-4">Logo</th>
                             <th className="px-6 py-4">Nama Institusi</th>
@@ -153,8 +201,16 @@ export default function PartnersIndex({ partners }: Props) {
                         {localPartners.length > 0 ? (
                             localPartners.map((partner, index) => (
                                 <tr key={partner.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-6 py-4 text-center">
+                                        <input 
+                                            type="checkbox" 
+                                            className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                            checked={selectedIds.includes(partner.id)}
+                                            onChange={() => handleSelect(partner.id)}
+                                        />
+                                    </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
                                             <div className="flex flex-col gap-1">
                                                 <button 
                                                     onClick={() => moveRow(index, 'up')}
@@ -196,13 +252,14 @@ export default function PartnersIndex({ partners }: Props) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                                     Belum ada data mitra.
                                 </td>
                             </tr>
                         )}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Modal */}
@@ -279,3 +336,5 @@ export default function PartnersIndex({ partners }: Props) {
         </AdminLayout>
     );
 }
+
+

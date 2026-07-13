@@ -125,4 +125,9 @@ class TestimonialController extends Controller
 
         return back()->with('success', $message ?? 'Aksi berhasil dilakukan.');
     }
+
+    public function export()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\TestimonialExport, 'testimoni-karir-sebaya-' . date('Y-m-d') . '.xlsx');
+    }
 }

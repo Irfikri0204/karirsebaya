@@ -97,4 +97,26 @@ class TopicContentController extends Controller
 
         return redirect()->back()->with('success', 'Urutan konten berhasil diperbarui.');
     }
+
+    public function bulkAction(Request $request, ModuleTopic $topic)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:topic_contents,id',
+            'action' => 'required|in:delete'
+        ]);
+
+        if ($validated['action'] === 'delete') {
+            $contents = TopicContent::whereIn('id', $validated['ids'])->where('module_topic_id', $topic->id)->get();
+            foreach ($contents as $content) {
+                if ($content->type === 'image' && str_starts_with($content->content, '/storage/')) {
+                    Storage::disk('public')->delete(str_replace('/storage/', '', $content->content));
+                }
+                $content->delete();
+            }
+            return redirect()->back()->with('success', 'Konten yang dipilih berhasil dihapus.');
+        }
+
+        return redirect()->back();
+    }
 }

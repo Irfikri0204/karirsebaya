@@ -138,23 +138,32 @@ export default function TestimonialsIndex({ testimonials }: Props) {
         <AdminLayout header="Kelola Testimoni">
             <Head title="Testimoni - Admin Karir Sebaya" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Daftar Testimoni</h2>
                     <p className="text-sm text-gray-500">Kelola cerita sukses dari pengguna platform.</p>
                 </div>
-                <button 
-                    onClick={openCreateModal}
-                    className="bg-brand-primary hover:bg-brand-purple text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-brand-primary/30 transition-all flex items-center gap-2"
-                >
-                    <i className="ph ph-plus-circle text-lg"></i>
-                    Tambah Testimoni
-                </button>
+                <div className="flex flex-wrap items-center gap-3">
+                    <a 
+                        href={route('admin.testimonials.export')}
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-green-900/20 transition-all flex items-center gap-2"
+                    >
+                        <i className="ph ph-file-xls text-lg"></i>
+                        Export Excel
+                    </a>
+                    <button 
+                        onClick={openCreateModal}
+                        className="bg-brand-primary hover:bg-brand-purple text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-brand-primary/30 transition-all flex items-center gap-2"
+                    >
+                        <i className="ph ph-plus-circle text-lg"></i>
+                        Tambah Testimoni
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden relative">
                 {selectedIds.length > 0 && (
-                    <div className="absolute top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-20 animate-fade-in">
+                    <div className="absolute top-0 left-0 right-0 min-h-[3.5rem] py-2 sm:py-0 bg-white border-b border-gray-200 flex flex-col sm:flex-row items-center justify-between px-6 z-20 animate-fade-in gap-2">
                         <span className="font-bold text-brand-primary">
                             {selectedIds.length} item dipilih
                         </span>
@@ -197,7 +206,7 @@ export default function TestimonialsIndex({ testimonials }: Props) {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto w-full overflow-y-hidden border-t border-gray-100">
                     <table className="w-full text-left text-sm text-gray-600 min-w-[800px]">
                         <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
                             <tr>
@@ -249,7 +258,7 @@ export default function TestimonialsIndex({ testimonials }: Props) {
                                         <p className="text-gray-600 italic text-xs line-clamp-3">"{testimonial.message}"</p>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs bg-${testimonial.avatar_color}-100 text-${testimonial.avatar_color}-600`}>
                                                 {testimonial.avatar_initials || testimonial.name.substring(0, 2).toUpperCase()}
                                             </div>
@@ -437,3 +446,5 @@ export default function TestimonialsIndex({ testimonials }: Props) {
         </AdminLayout>
     );
 }
+
+

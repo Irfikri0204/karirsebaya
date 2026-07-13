@@ -42,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/tes-karir/hasil/{result}', [\App\Http\Controllers\RiasecTestController::class, 'show'])->name('tes-karir.result');
 });
 
+Route::get('/fikri', [\App\Http\Controllers\FikriController::class, 'index'])->name('fikri');
+
 Route::get('/tim-kami', function () {
     return Inertia::render('TimKami/Index', [
         'teamMembers' => \App\Models\TeamMember::where('is_active', true)->get()
@@ -80,6 +82,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 
+        Route::get('/fikri-profile', [\App\Http\Controllers\FikriController::class, 'edit'])->name('fikri-profile.index');
+        Route::post('/fikri-profile', [\App\Http\Controllers\FikriController::class, 'update'])->name('fikri-profile.update');
+
         Route::post('features/reorder', [\App\Http\Controllers\FeatureController::class, 'reorder'])->name('features.reorder');
         Route::resource('features', \App\Http\Controllers\FeatureController::class)->except(['create', 'show', 'edit']);
         Route::post('services/reorder', [\App\Http\Controllers\ServiceController::class, 'reorder'])->name('services.reorder');
@@ -96,6 +101,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // RIASEC Routes
     Route::get('/riasec/results', [\App\Http\Controllers\Admin\RiasecTestResultsController::class, 'index'])->name('riasec.results.index');
+    Route::post('/riasec/results/bulk', [\App\Http\Controllers\Admin\RiasecTestResultsController::class, 'bulkAction'])->name('riasec.results.bulk');
     Route::get('/riasec/results/export', [\App\Http\Controllers\Admin\RiasecTestResultsController::class, 'export'])->name('riasec.results.export');
 
     // CMS Routes
@@ -104,6 +110,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('partners', \App\Http\Controllers\PartnerController::class)->except(['create', 'show', 'edit']);
     
     Route::post('testimonials/bulk', [\App\Http\Controllers\TestimonialController::class, 'bulkAction'])->name('testimonials.bulk');
+    Route::get('testimonials/export', [\App\Http\Controllers\TestimonialController::class, 'export'])->name('testimonials.export');
     Route::resource('testimonials', \App\Http\Controllers\TestimonialController::class)->except(['create', 'show', 'edit']);
     
     Route::post('users/bulk', [\App\Http\Controllers\Admin\UserController::class, 'bulkAction'])->name('users.bulk');
@@ -111,6 +118,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     Route::resource('modules', \App\Http\Controllers\Admin\ModuleController::class)->except(['create', 'edit']);
     Route::post('modules/reorder', [\App\Http\Controllers\Admin\ModuleController::class, 'reorder'])->name('modules.reorder');
+    Route::post('modules/bulk', [\App\Http\Controllers\Admin\ModuleController::class, 'bulkAction'])->name('modules.bulk');
     
     Route::post('modules/{module}/topics', [\App\Http\Controllers\Admin\ModuleTopicController::class, 'store'])->name('topics.store');
     Route::put('topics/{topic}', [\App\Http\Controllers\Admin\ModuleTopicController::class, 'update'])->name('topics.update');
@@ -122,6 +130,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('contents/{content}', [\App\Http\Controllers\Admin\TopicContentController::class, 'update'])->name('topic-contents.update'); // Using POST for file uploads
     Route::delete('contents/{content}', [\App\Http\Controllers\Admin\TopicContentController::class, 'destroy'])->name('topic-contents.destroy');
     Route::post('topics/{topic}/contents/reorder', [\App\Http\Controllers\Admin\TopicContentController::class, 'reorder'])->name('topic-contents.reorder');
+    Route::post('topics/{topic}/contents/bulk', [\App\Http\Controllers\Admin\TopicContentController::class, 'bulkAction'])->name('topic-contents.bulk');
 });
 
 Route::middleware('auth')->group(function () {

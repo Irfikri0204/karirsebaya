@@ -42,7 +42,7 @@ export default function ModulIndex({ modules }: Props) {
                                             </div>
                                         )}
                                         <Link href={route('modul.show', mod.id)} className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-brand-primary shadow-sm border border-white/50 hover:bg-brand-primary hover:text-white transition-colors">
-                                            {mod.hashtag ? mod.hashtag : 'Modul'}
+                                            {mod.hashtag ? mod.hashtag.replace(/^#+/, '') : 'Modul'}
                                         </Link>
                                     </div>
                                     <div className="p-6 flex flex-col flex-grow">

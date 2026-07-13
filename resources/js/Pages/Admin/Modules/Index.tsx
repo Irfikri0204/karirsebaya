@@ -20,6 +20,7 @@ interface Props {
 export default function ModulesIndex({ modules }: Props) {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingModule, setEditingModule] = useState<Module | null>(null);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         title: '',
@@ -99,28 +100,76 @@ export default function ModulesIndex({ modules }: Props) {
         }
     };
 
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(modules.map(m => m.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelect = (id: number) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.length === 0) return;
+        if (confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.length} modul yang dipilih beserta topik di dalamnya?`)) {
+            router.post(route('admin.modules.bulk'), {
+                ids: selectedIds,
+                action: 'delete'
+            }, {
+                onSuccess: () => setSelectedIds([])
+            });
+        }
+    };
+
     return (
         <AdminLayout header="Manajemen Modul Edukasi">
             <Head title="Manajemen Modul - Admin Karir Sebaya" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Modul Edukasi</h2>
                     <p className="text-sm text-gray-500">Kelola modul PDF atau tautan referensi karir untuk pengguna.</p>
                 </div>
-                <button 
-                    onClick={openCreateModal}
-                    className="bg-brand-primary hover:bg-brand-purple text-white px-5 py-2.5 rounded-full font-bold shadow-lg shadow-purple-900/20 transition-all flex items-center gap-2"
-                >
-                    <i className="ph ph-plus-circle text-lg"></i>
-                    Tambah Modul
-                </button>
+                <div className="flex flex-wrap items-center gap-3">
+                    {selectedIds.length > 0 && (
+                        <button 
+                            onClick={handleBulkDelete}
+                            className="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-full font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2"
+                        >
+                            <i className="ph ph-trash text-lg"></i>
+                            Hapus Terpilih ({selectedIds.length})
+                        </button>
+                    )}
+                    <button 
+                        onClick={openCreateModal}
+                        className="bg-brand-primary hover:bg-brand-purple text-white px-5 py-2.5 rounded-full font-bold shadow-lg shadow-purple-900/20 transition-all flex items-center gap-2"
+                    >
+                        <i className="ph ph-plus-circle text-lg"></i>
+                        Tambah Modul
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left text-sm text-gray-600">
-                    <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+                <div className="overflow-x-auto w-full overflow-y-hidden border-t border-gray-100">
+                    <table className="w-full text-left text-sm text-gray-600 min-w-[800px]">
+                        <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
                         <tr>
+                            <th className="px-6 py-4 w-12 text-center">
+                                <input 
+                                    type="checkbox" 
+                                    className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                    checked={modules.length > 0 && selectedIds.length === modules.length}
+                                    onChange={handleSelectAll}
+                                />
+                            </th>
                             <th className="px-6 py-4 w-16">Urutan</th>
                             <th className="px-6 py-4">Informasi Modul</th>
                             <th className="px-6 py-4">Hashtag</th>
@@ -132,6 +181,14 @@ export default function ModulesIndex({ modules }: Props) {
                         {modules.length > 0 ? (
                             modules.map((mod, index) => (
                                 <tr key={mod.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-6 py-4 text-center">
+                                        <input 
+                                            type="checkbox" 
+                                            className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                            checked={selectedIds.includes(mod.id)}
+                                            onChange={() => handleSelect(mod.id)}
+                                        />
+                                    </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col items-center gap-1">
                                             <button 
@@ -167,7 +224,7 @@ export default function ModulesIndex({ modules }: Props) {
                                     </td>
                                     <td className="px-6 py-4">
                                         {mod.hashtag ? (
-                                            <span className="text-brand-primary font-medium">{mod.hashtag}</span>
+                                            <span className="text-brand-primary font-medium">{mod.hashtag.replace(/^#+/, '')}</span>
                                         ) : '-'}
                                     </td>
                                     <td className="px-6 py-4">
@@ -192,13 +249,14 @@ export default function ModulesIndex({ modules }: Props) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                                     Belum ada modul edukasi.
                                 </td>
                             </tr>
                         )}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <Modal show={isCreateModalOpen} onClose={closeCreateModal} maxWidth="md">
@@ -300,3 +358,5 @@ export default function ModulesIndex({ modules }: Props) {
         </AdminLayout>
     );
 }
+
+

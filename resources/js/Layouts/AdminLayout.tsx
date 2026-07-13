@@ -43,6 +43,10 @@ export default function AdminLayout({ children, header }: AdminLayoutProps) {
                                 <i className="ph ph-browser text-xl"></i>
                                 Halaman Publik
                             </Link>
+                            <Link href={route('admin.fikri-profile.index')} className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${route().current('admin.fikri-profile.*') ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white'}`}>
+                                <i className="ph ph-user-circle-gear text-xl"></i>
+                                Profil Fikri
+                            </Link>
                             <Link href={route('admin.features.index')} className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${route().current('admin.features.*') ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white'}`}>
                                 <i className="ph ph-star text-xl"></i>
                                 Keunggulan Utama
@@ -122,15 +126,15 @@ export default function AdminLayout({ children, header }: AdminLayoutProps) {
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col min-w-0 h-screen lg:ml-64">
                 {/* Topbar */}
-                <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 shrink-0 z-30">
-                    <div className="flex items-center">
-                        <button onClick={() => setSidebarOpen(true)} className="text-gray-500 hover:text-gray-700 lg:hidden mr-4">
+                <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 shrink-0 z-30 gap-2">
+                    <div className="flex items-center flex-1 min-w-0">
+                        <button onClick={() => setSidebarOpen(true)} className="text-gray-500 hover:text-gray-700 lg:hidden mr-3 sm:mr-4 shrink-0">
                             <i className="ph ph-list text-2xl"></i>
                         </button>
-                        <h1 className="text-xl font-bold text-gray-800">{header || 'Dashboard'}</h1>
+                        <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate pr-2">{header || 'Dashboard'}</h1>
                     </div>
                     
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                         <Link href="/" className="text-sm text-brand-primary font-medium hover:underline hidden sm:block">
                             Lihat Website <i className="ph ph-arrow-square-out ml-1"></i>
                         </Link>

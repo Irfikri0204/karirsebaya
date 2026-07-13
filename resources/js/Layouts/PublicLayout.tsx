@@ -12,6 +12,7 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children, transparentNavbar = false }: PublicLayoutProps) {
     const { auth, global_settings } = usePage().props as any;
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         // Initialize AOS
@@ -39,6 +40,7 @@ export default function PublicLayout({ children, transparentNavbar = false }: Pu
     const { url } = usePage();
     useEffect(() => {
         AOS.refresh();
+        setIsMobileMenuOpen(false); // Close mobile menu on navigation
     }, [url]);
 
     return (
@@ -107,9 +109,49 @@ export default function PublicLayout({ children, transparentNavbar = false }: Pu
                     </div>
                     
                     {/* Mobile Menu Toggle */}
-                    <button className="md:hidden text-2xl text-white">
-                        <i className="ph ph-list"></i>
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="md:hidden text-2xl text-white hover:text-brand-accent transition-colors"
+                    >
+                        <i className={`ph ${isMobileMenuOpen ? 'ph-x' : 'ph-list'}`}></i>
                     </button>
+                </div>
+
+                {/* Mobile Menu Content */}
+                <div className={`md:hidden absolute top-full left-0 right-0 bg-brand-dark/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
+                    isMobileMenuOpen ? 'max-h-[500px] py-4' : 'max-h-0 py-0 border-transparent'
+                }`}>
+                    <div className="flex flex-col px-6 space-y-4 text-center">
+                        <Link href={route('home')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Home</Link>
+                        <Link href={route('modul')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Modul</Link>
+                        <Link href={route('tes-karir.index')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Tes Karir</Link>
+                        <Link href={route('konseling')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Konseling</Link>
+                        <Link href={route('testimoni')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Testimoni</Link>
+                        <Link href={route('tim-kami')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Tim Kami</Link>
+                        <Link href={route('panduan')} className="text-white hover:text-brand-accent transition-colors py-2 border-b border-white/5">Panduan</Link>
+                        
+                        <div className="pt-4 pb-2 flex justify-center">
+                            {auth?.user ? (
+                                <div className="flex flex-col gap-3 w-full max-w-xs">
+                                    {(auth.user.role === 'admin' || auth.user.role === 'superadmin') && (
+                                        <Link href={route('admin.dashboard')} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors">
+                                            <i className="ph ph-squares-four text-lg"></i> Dashboard Admin
+                                        </Link>
+                                    )}
+                                    <Link href={route('profile.edit')} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors">
+                                        <i className="ph ph-user text-lg"></i> Profil Saya
+                                    </Link>
+                                    <Link href={route('logout')} method="post" as="button" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors">
+                                        <i className="ph ph-sign-out text-lg"></i> Logout
+                                    </Link>
+                                </div>
+                            ) : (
+                                <Link href={route('login')} className="w-full max-w-xs py-3 rounded-xl bg-brand-accent hover:bg-brand-primary text-white font-bold transition-colors">
+                                    Masuk / Daftar
+                                </Link>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </nav>
 

@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 interface RiasecTestResult {
+    id: number;
     uuid: string;
     primary_category_code: string;
     created_at: string;
@@ -34,6 +35,7 @@ interface Props {
 export default function ResultsIndex({ results, filters }: Props) {
     const [searchQuery, setSearchQuery] = useState(filters?.search || '');
     const [categoryFilter, setCategoryFilter] = useState(filters?.category || '');
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const applyFilters = (search: string, category: string) => {
         router.get(
@@ -58,22 +60,61 @@ export default function ResultsIndex({ results, filters }: Props) {
         setCategoryFilter(val);
         applyFilters(searchQuery, val);
     };
+
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(results.data.map(r => r.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelect = (id: number) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.length === 0) return;
+        if (confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.length} data hasil tes yang dipilih?`)) {
+            router.post(route('admin.riasec.results.bulk'), {
+                ids: selectedIds,
+                action: 'delete'
+            }, {
+                onSuccess: () => setSelectedIds([])
+            });
+        }
+    };
     return (
         <AdminLayout header="Data Hasil Tes Minat Karir">
             <Head title="Hasil Tes - Admin Karir Sebaya" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Hasil Tes Pengguna</h2>
                     <p className="text-sm text-gray-500">Melihat daftar hasil tes pengguna yang telah diselesaikan.</p>
                 </div>
-                <a 
-                    href={route('admin.riasec.results.export')}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-green-900/20 transition-all flex items-center gap-2"
-                >
-                    <i className="ph ph-file-csv text-lg"></i>
-                    Export Data (CSV)
-                </a>
+                <div className="flex flex-wrap items-center gap-3">
+                    {selectedIds.length > 0 && (
+                        <button 
+                            onClick={handleBulkDelete}
+                            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2"
+                        >
+                            <i className="ph ph-trash text-lg"></i>
+                            Hapus Terpilih ({selectedIds.length})
+                        </button>
+                    )}
+                    <a 
+                        href={route('admin.riasec.results.export')}
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-green-900/20 transition-all flex items-center gap-2"
+                    >
+                        <i className="ph ph-file-csv text-lg"></i>
+                        Export Data (CSV)
+                    </a>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -118,10 +159,18 @@ export default function ResultsIndex({ results, filters }: Props) {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto w-full overflow-y-hidden border-t border-gray-100">
                     <table className="w-full text-left text-sm text-gray-600 min-w-[800px]">
                     <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
                         <tr>
+                            <th className="px-6 py-4 w-12 text-center">
+                                <input 
+                                    type="checkbox" 
+                                    className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                    checked={results.data.length > 0 && selectedIds.length === results.data.length}
+                                    onChange={handleSelectAll}
+                                />
+                            </th>
                             <th className="px-6 py-4">Nama Pengguna</th>
                             <th className="px-6 py-4">Email</th>
                             <th className="px-6 py-4">Hasil Dominan</th>
@@ -132,6 +181,14 @@ export default function ResultsIndex({ results, filters }: Props) {
                         {results.data.length > 0 ? (
                             results.data.map((result) => (
                                 <tr key={result.uuid} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-6 py-4 text-center">
+                                        <input 
+                                            type="checkbox" 
+                                            className="rounded border-gray-300 text-brand-primary focus:ring-brand-primary cursor-pointer"
+                                            checked={selectedIds.includes(result.id)}
+                                            onChange={() => handleSelect(result.id)}
+                                        />
+                                    </td>
                                     <td className="px-6 py-4 font-bold text-gray-900">
                                         {result.user ? result.user.name : <span className="text-gray-400 italic">User Terhapus</span>}
                                     </td>
@@ -156,7 +213,7 @@ export default function ResultsIndex({ results, filters }: Props) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                                     Belum ada data hasil tes.
                                 </td>
                             </tr>
@@ -190,3 +247,5 @@ export default function ResultsIndex({ results, filters }: Props) {
         </AdminLayout>
     );
 }
+
+

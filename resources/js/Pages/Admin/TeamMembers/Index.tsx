@@ -163,7 +163,7 @@ export default function TeamMembersIndex({ teamMembers }: Props) {
         <AdminLayout header="Kelola Tim & Konselor">
             <Head title="Kelola Tim - Admin Karir Sebaya" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Daftar Anggota</h2>
                     <p className="text-sm text-gray-500">Kelola profil pengembang, pakar, dan konselor sebaya.</p>
@@ -179,7 +179,7 @@ export default function TeamMembersIndex({ teamMembers }: Props) {
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50">
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <div className="relative">
                             <i className="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                             <input 
@@ -450,3 +450,4 @@ export default function TeamMembersIndex({ teamMembers }: Props) {
         </AdminLayout>
     );
 }
+

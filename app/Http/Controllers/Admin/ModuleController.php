@@ -42,6 +42,10 @@ class ModuleController extends Controller
             $validated['cover_image'] = '/storage/' . $path;
         }
 
+        if (isset($validated['hashtag'])) {
+            $validated['hashtag'] = ltrim($validated['hashtag'], '#');
+        }
+
         $validated['order'] = Module::max('order') + 1;
 
         Module::create($validated);
@@ -77,6 +81,10 @@ class ModuleController extends Controller
             unset($validated['cover_image']);
         }
 
+        if (isset($validated['hashtag'])) {
+            $validated['hashtag'] = ltrim($validated['hashtag'], '#');
+        }
+
         $module->update($validated);
 
         return redirect()->back()->with('success', 'Modul berhasil diperbarui.');
@@ -105,5 +113,27 @@ class ModuleController extends Controller
         }
 
         return redirect()->back()->with('success', 'Urutan modul berhasil diperbarui.');
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:modules,id',
+            'action' => 'required|in:delete'
+        ]);
+
+        if ($validated['action'] === 'delete') {
+            $modules = Module::whereIn('id', $validated['ids'])->get();
+            foreach ($modules as $module) {
+                if ($module->cover_image && str_starts_with($module->cover_image, '/storage/')) {
+                    Storage::disk('public')->delete(str_replace('/storage/', '', $module->cover_image));
+                }
+                $module->delete();
+            }
+            return redirect()->back()->with('success', 'Modul yang dipilih berhasil dihapus.');
+        }
+
+        return redirect()->back();
     }
 }

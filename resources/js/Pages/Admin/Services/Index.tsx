@@ -117,12 +117,12 @@ export default function ServicesIndex({ services }: Props) {
         <AdminLayout header="Kelola Layanan Kami">
             <Head title="Layanan Kami - Admin Karir Sebaya" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Daftar Layanan</h2>
                     <p className="text-sm text-gray-500">Atur "Layanan Kami" di halaman Beranda.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                     {isOrderChanged && (
                         <button 
                             onClick={saveOrder}
@@ -143,8 +143,9 @@ export default function ServicesIndex({ services }: Props) {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left text-sm text-gray-600">
-                    <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+                <div className="overflow-x-auto w-full overflow-y-hidden border-t border-gray-100">
+                    <table className="w-full text-left text-sm text-gray-600 min-w-[800px]">
+                        <thead className="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
                         <tr>
                             <th className="px-6 py-4">Urutan</th>
                             <th className="px-6 py-4">Icon</th>
@@ -159,7 +160,7 @@ export default function ServicesIndex({ services }: Props) {
                             localServices.map((service, index) => (
                                 <tr key={service.id} className="hover:bg-gray-50/50 transition-colors">
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
                                             <div className="flex flex-col gap-1">
                                                 <button 
                                                     onClick={() => moveRow(index, 'up')}
@@ -208,8 +209,9 @@ export default function ServicesIndex({ services }: Props) {
                                 </td>
                             </tr>
                         )}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Modal */}
@@ -328,3 +330,4 @@ export default function ServicesIndex({ services }: Props) {
         </AdminLayout>
     );
 }
+

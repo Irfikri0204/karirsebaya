@@ -64,11 +64,11 @@ export default function CounselingSettings({ settings }: SettingsProps) {
                             {settings.panduan_file && !data.remove_panduan_file && (
                                 <div className="mb-6 border border-gray-200 rounded-xl bg-gray-50 overflow-hidden">
                                     <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
                                             <i className="ph-fill ph-file-pdf text-red-500 text-2xl"></i>
                                             <span className="text-sm font-bold text-gray-800">File panduan saat ini aktif</span>
                                         </div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
                                             <a href={settings.panduan_file} target="_blank" className="text-brand-primary text-sm font-bold hover:underline flex items-center gap-1">
                                                 Buka Penuh <i className="ph ph-arrow-square-out"></i>
                                             </a>
@@ -116,3 +116,4 @@ export default function CounselingSettings({ settings }: SettingsProps) {
         </AdminLayout>
     );
 }
+
