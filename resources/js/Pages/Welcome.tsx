@@ -48,12 +48,12 @@ export default function Welcome({
                         </p>
                         
                         <div className="flex flex-wrap items-center gap-4 mb-16" data-aos="fade-up" data-aos-delay="300">
-                            <a href="#" className="px-8 py-3.5 rounded-full bg-white text-brand-purple font-semibold hover:bg-gray-100 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                            <Link href={auth.user ? route('modul') : route('login')} className="px-8 py-3.5 rounded-full bg-white text-brand-purple font-semibold hover:bg-gray-100 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
                                 Mulai Sekarang <i className="ph ph-arrow-right ml-1"></i>
-                            </a>
-                            <a href="#" className="px-8 py-3.5 rounded-full bg-transparent border border-white/30 text-white font-medium hover:bg-white/10 transition-all duration-300">
+                            </Link>
+                            <Link href={route('panduan')} className="px-8 py-3.5 rounded-full bg-transparent border border-white/30 text-white font-medium hover:bg-white/10 transition-all duration-300">
                                 Pelajari Lebih Lanjut
-                            </a>
+                            </Link>
                         </div>
                         
                         <div className="flex items-center gap-8 border-t border-white/10 pt-8" data-aos="fade-up" data-aos-delay="400">
