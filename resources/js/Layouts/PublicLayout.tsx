@@ -53,9 +53,9 @@ export default function PublicLayout({ children, transparentNavbar = false }: Pu
             }`}>
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <Link href={route('home')} className="flex items-center gap-2" data-aos="fade-down" data-aos-duration="800">
-                        <div className="w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center shadow-lg overflow-hidden border border-white/20">
+                        <div className="h-8 flex items-center justify-center">
                             {global_settings?.navbar_icon ? (
-                                <img src={global_settings.navbar_icon} alt="Logo" className="w-full h-full object-cover" />
+                                <img src={global_settings.navbar_icon} alt="Logo" className="h-full w-auto object-contain" />
                             ) : (
                                 <i className="ph ph-briefcase text-xl text-white"></i>
                             )}
@@ -166,9 +166,9 @@ export default function PublicLayout({ children, transparentNavbar = false }: Pu
                     
                     <div className="lg:col-span-2">
                         <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center overflow-hidden">
+                            <div className="h-8 flex items-center justify-center">
                                 {global_settings?.navbar_icon ? (
-                                    <img src={global_settings.navbar_icon} alt="Logo" className="w-full h-full object-cover" />
+                                    <img src={global_settings.navbar_icon} alt="Logo" className="h-full w-auto object-contain" />
                                 ) : (
                                     <i className="ph ph-briefcase text-xl text-white"></i>
                                 )}

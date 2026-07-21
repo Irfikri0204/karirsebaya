@@ -1,7 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function AdminDashboard({ stats }: { stats: any }) {
+export default function AdminDashboard({ stats, new_users = [], recent_activities = [] }: { stats: any, new_users?: any[], recent_activities?: any[] }) {
     const { auth } = usePage().props as any;
 
     return (
@@ -64,67 +64,57 @@ export default function AdminDashboard({ stats }: { stats: any }) {
                 {/* Aktivitas Terbaru Pengguna */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                        <h3 className="font-bold text-gray-800">Aktivitas Terbaru Pengguna</h3>
+                        <h3 className="font-bold text-gray-800">Aktivitas Terbaru</h3>
                     </div>
                     <div className="p-0">
                         <div className="divide-y divide-gray-100">
-                            <div className="p-6 flex items-start gap-4 hover:bg-gray-50 transition-colors">
-                                <div className="mt-1 w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center shrink-0">
-                                    <i className="ph-fill ph-user-plus"></i>
+                            {recent_activities.length > 0 ? recent_activities.map((activity, index) => (
+                                <div key={index} className="p-6 flex items-start gap-4 hover:bg-gray-50 transition-colors">
+                                    <div className={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                                        activity.type === 'user' ? 'bg-blue-100 text-blue-500' :
+                                        activity.type === 'test' ? 'bg-green-100 text-green-500' :
+                                        'bg-purple-100 text-purple-500'
+                                    }`}>
+                                        <i className={`ph-fill ${
+                                            activity.type === 'user' ? 'ph-user-plus' :
+                                            activity.type === 'test' ? 'ph-brain' :
+                                            'ph-chat-centered-text'
+                                        }`}></i>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-800">{activity.title}</p>
+                                        <p className="text-xs text-gray-500 mt-1">{activity.description}</p>
+                                        <span className="text-xs text-gray-400 mt-2 block">{activity.time}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-medium text-gray-800">Budi Santoso mendaftar ke platform</p>
-                                    <p className="text-xs text-gray-500 mt-1">Asal: Universitas Negeri Makassar</p>
-                                    <span className="text-xs text-gray-400 mt-2 block">10 menit yang lalu</span>
-                                </div>
-                            </div>
-                            
-                            <div className="p-6 flex items-start gap-4 hover:bg-gray-50 transition-colors">
-                                <div className="mt-1 w-8 h-8 rounded-full bg-green-100 text-green-500 flex items-center justify-center shrink-0">
-                                    <i className="ph-fill ph-brain"></i>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-gray-800">Siti Aminah menyelesaikan Tes Minat Karir (RIASEC)</p>
-                                    <p className="text-xs text-gray-500 mt-1">Hasil: Dominan Tipe Sosial (S)</p>
-                                    <span className="text-xs text-gray-400 mt-2 block">45 menit yang lalu</span>
-                                </div>
-                            </div>
-                            
-                            <div className="p-6 flex items-start gap-4 hover:bg-gray-50 transition-colors">
-                                <div className="mt-1 w-8 h-8 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center shrink-0">
-                                    <i className="ph-fill ph-chat-centered-text"></i>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-gray-800">Andi Reza memberikan testimoni</p>
-                                    <p className="text-xs text-gray-500 mt-1">"Platform yang sangat membantu untuk karir saya..."</p>
-                                    <span className="text-xs text-gray-400 mt-2 block">2 jam yang lalu</span>
-                                </div>
-                            </div>
+                            )) : (
+                                <div className="p-6 text-center text-gray-500 text-sm">Belum ada aktivitas.</div>
+                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* Recent Registrations Mock */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                {/* Recent Registrations */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-max">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                         <h3 className="font-bold text-gray-800">Pengguna Baru</h3>
-                        <span className="text-xs font-medium text-brand-primary bg-brand-light px-2 py-1 rounded-md">Hari Ini</span>
                     </div>
                     <div className="divide-y divide-gray-100">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                        {new_users.length > 0 ? new_users.map((user) => (
+                            <div key={user.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                        <i className="ph ph-user"></i>
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
+                                        {user.name.charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-800 text-sm">User Baru {i}</p>
-                                        <p className="text-gray-500 text-xs">user{i}@example.com</p>
+                                        <p className="font-bold text-gray-800 text-sm">{user.name}</p>
+                                        <p className="text-gray-500 text-xs">{user.email}</p>
                                     </div>
                                 </div>
-                                <span className="text-xs text-gray-400">10 mnt yang lalu</span>
                             </div>
-                        ))}
+                        )) : (
+                            <div className="p-6 text-center text-gray-500 text-sm">Belum ada pengguna baru.</div>
+                        )}
                     </div>
                 </div>
             </div>

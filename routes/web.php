@@ -64,13 +64,55 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
+        $newUsers = \App\Models\User::where('role', 'user')->latest()->take(3)->get();
+        
+        $recentActivities = collect();
+        
+        $usersActivity = \App\Models\User::where('role', 'user')->latest()->take(3)->get()->map(function($user) {
+            return [
+                'type' => 'user',
+                'title' => $user->name . ' mendaftar ke platform',
+                'description' => 'Email: ' . $user->email,
+                'time' => $user->created_at->diffForHumans(),
+                'timestamp' => $user->created_at
+            ];
+        });
+        
+        $testsActivity = \App\Models\RiasecTestResult::with('user')->latest()->take(3)->get()->map(function($test) {
+            return [
+                'type' => 'test',
+                'title' => ($test->user ? $test->user->name : 'Pengguna') . ' menyelesaikan Tes Minat Karir',
+                'description' => 'Hasil: ' . $test->riasec_code,
+                'time' => $test->created_at->diffForHumans(),
+                'timestamp' => $test->created_at
+            ];
+        });
+
+        $testimoniActivity = \App\Models\Testimonial::latest()->take(3)->get()->map(function($testi) {
+            return [
+                'type' => 'testimonial',
+                'title' => $testi->name . ' memberikan testimoni',
+                'description' => '"' . \Illuminate\Support\Str::limit($testi->message, 50) . '"',
+                'time' => $testi->created_at->diffForHumans(),
+                'timestamp' => $testi->created_at
+            ];
+        });
+
+        $recentActivities = $recentActivities->concat($usersActivity)->concat($testsActivity)->concat($testimoniActivity)
+            ->sortByDesc('timestamp')
+            ->take(5)
+            ->values()
+            ->all();
+
         return Inertia::render('Admin/Dashboard/Index', [
             'stats' => [
                 'users_count' => \App\Models\User::where('role', 'user')->count(),
                 'admins_count' => \App\Models\User::where('role', 'admin')->count(),
                 'riasec_tests_count' => \App\Models\RiasecTestResult::count(),
                 'modules_count' => \App\Models\Module::count(),
-            ]
+            ],
+            'new_users' => $newUsers,
+            'recent_activities' => $recentActivities
         ]);
     })->name('dashboard');
 

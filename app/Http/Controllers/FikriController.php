@@ -42,15 +42,17 @@ class FikriController extends Controller
         );
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('public/fikri');
-            $url = Storage::url($path);
+            $file = $request->file('photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/fikri'), $filename);
+            $url = '/uploads/fikri/' . $filename;
             
             // Delete old photo if exists
             $oldSetting = Setting::where('key', 'fikri_photo')->first();
             if ($oldSetting && $oldSetting->value) {
-                $oldPath = str_replace('/storage/', 'public/', $oldSetting->value);
-                if (Storage::exists($oldPath)) {
-                    Storage::delete($oldPath);
+                $oldPath = public_path($oldSetting->value);
+                if (file_exists($oldPath) && is_file($oldPath)) {
+                    unlink($oldPath);
                 }
             }
 
