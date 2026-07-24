@@ -1,6 +1,7 @@
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { FormEventHandler, useState, useRef, useEffect } from 'react';
+import FreeformCropModal from '@/Components/FreeformCropModal';
 
 interface Partner {
     id: number;
@@ -19,6 +20,8 @@ export default function PartnersIndex({ partners }: Props) {
     const [localPartners, setLocalPartners] = useState<Partner[]>([]);
     const [isOrderChanged, setIsOrderChanged] = useState(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -140,6 +143,19 @@ export default function PartnersIndex({ partners }: Props) {
         }
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const reader = new FileReader();
+            reader.addEventListener('load', () => setCropImageSrc(reader.result?.toString() || ''));
+            reader.readAsDataURL(e.target.files[0]);
+            setIsCropModalOpen(true);
+        }
+    };
+
+    const handleCropComplete = (croppedFile: File) => {
+        setData('logo', croppedFile);
+    };
+
     return (
         <AdminLayout header="Kelola Institusi Mitra">
             <Head title="Mitra - Admin Karir Sebaya" />
@@ -232,7 +248,7 @@ export default function PartnersIndex({ partners }: Props) {
                                     </td>
                                     <td className="px-6 py-4">
                                         {partner.logo_path ? (
-                                            <img src={`/storage/${partner.logo_path}`} alt={partner.name} className="h-10 w-10 object-cover rounded-xl" />
+                                            <img src={`/storage/${partner.logo_path}`} alt={partner.name} className="h-10 w-10 object-contain rounded-xl" />
                                         ) : (
                                             <div className="h-10 w-10 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 font-bold uppercase">
                                                 {partner.name.substring(0, 2)}
@@ -294,10 +310,13 @@ export default function PartnersIndex({ partners }: Props) {
                                     type="file" 
                                     accept="image/*"
                                     ref={fileInputRef}
-                                    onChange={e => setData('logo', e.target.files ? e.target.files[0] : null)}
+                                    onChange={handleFileChange}
                                     className="w-full rounded-xl border border-gray-300 file:bg-brand-primary file:text-white file:border-0 file:py-2 file:px-4 file:rounded-l-xl file:mr-4 file:hover:bg-brand-purple cursor-pointer focus:outline-none"
                                 />
-                                <p className="text-xs text-gray-500 mt-2">Biarkan kosong jika tidak ingin mengubah/menambahkan logo. Gambar akan dipotong secara proporsional berkat CSS.</p>
+                                {data.logo && (
+                                    <p className="text-sm text-green-600 mt-2 font-medium">✓ Logo siap diunggah</p>
+                                )}
+                                <p className="text-xs text-gray-500 mt-2">Biarkan kosong jika tidak ingin mengubah/menambahkan logo. Gambar dapat dipotong secara bebas (freeform).</p>
                                 {errors.logo && <p className="text-red-500 text-xs mt-1">{errors.logo}</p>}
                             </div>
 
@@ -333,6 +352,13 @@ export default function PartnersIndex({ partners }: Props) {
                     </div>
                 </div>
             )}
+            
+            <FreeformCropModal
+                show={isCropModalOpen}
+                imageSrc={cropImageSrc}
+                onClose={() => setIsCropModalOpen(false)}
+                onCropComplete={handleCropComplete}
+            />
         </AdminLayout>
     );
 }

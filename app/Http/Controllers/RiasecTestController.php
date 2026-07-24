@@ -17,6 +17,18 @@ class RiasecTestController extends Controller
         return Inertia::render('TesKarir/Index');
     }
 
+    public function history()
+    {
+        $results = RiasecTestResult::with('primaryCategory')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+            
+        return Inertia::render('TesKarir/History', [
+            'results' => $results
+        ]);
+    }
+
     public function create()
     {
         $settings = \App\Models\Setting::pluck('value', 'key')->toArray();

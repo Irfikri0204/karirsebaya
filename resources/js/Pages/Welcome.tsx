@@ -260,7 +260,7 @@ export default function Welcome({
                         {partners.map(partner => (
                             <div key={partner.id} className="bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10 rounded-xl h-24 flex flex-col items-center justify-center group cursor-pointer p-2">
                                 {partner.logo_path ? (
-                                    <img src={`/storage/${partner.logo_path}`} alt={partner.name} className="h-10 w-10 object-cover rounded-xl mb-2 group-hover:scale-110 transition-transform" />
+                                    <img src={`/storage/${partner.logo_path}`} alt={partner.name} className="h-10 w-10 object-contain rounded-xl mb-2 group-hover:scale-110 transition-transform" />
                                 ) : (
                                     <div className="w-10 h-10 bg-brand-primary rounded-full mb-2 flex items-center justify-center font-bold text-white text-xs group-hover:scale-110 transition-transform">{partner.name.substring(0, 2).toUpperCase()}</div>
                                 )}

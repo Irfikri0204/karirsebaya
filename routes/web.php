@@ -6,10 +6,30 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    $visitorCount = \App\Models\Setting::firstOrCreate(['key' => 'visitor_count'], ['value' => '0']);
+    if (!session()->has('visited')) {
+        $newVal = ((int)$visitorCount->value) + 1;
+        $visitorCount->update(['value' => (string)$newVal]);
+        session()->put('visited', true);
+    }
+
+    $counselorAuto = \App\Models\Setting::where('key', 'stat_counselors_auto')->value('value') === '1';
+    if ($counselorAuto) {
+        $counselorsCount = \App\Models\TeamMember::where('is_active', true)->whereIn('category', ['expert', 'peer'])->count();
+    } else {
+        $counselorsCount = \App\Models\Setting::where('key', 'stat_counselors')->value('value');
+    }
+
+    $visitorAuto = \App\Models\Setting::where('key', 'visitor_count_auto')->value('value') === '1';
+    $visitorStart = (int)\App\Models\Setting::where('key', 'visitor_count_start')->value('value');
+    $totalVisitors = $visitorAuto ? (int)$visitorCount->value : ($visitorStart + (int)$visitorCount->value);
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'usersCount' => \App\Models\User::where('role', 'user')->count(),
+        'counselorsCount' => $counselorsCount,
+        'visitorCount' => $totalVisitors,
         'features' => \App\Models\Feature::orderBy('order')->get(),
         'services' => \App\Models\Service::orderBy('order')->get(),
         'partners' => \App\Models\Partner::orderBy('order')->get(),
@@ -37,6 +57,7 @@ Route::get('/modul', [\App\Http\Controllers\ModulController::class, 'index'])->n
 Route::get('/modul/{id}', [\App\Http\Controllers\ModulController::class, 'show'])->name('modul.show');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/tes-karir/riwayat', [\App\Http\Controllers\RiasecTestController::class, 'history'])->name('tes-karir.history');
     Route::get('/tes-karir/kerjakan', [\App\Http\Controllers\RiasecTestController::class, 'create'])->name('tes-karir.create');
     Route::post('/tes-karir/kerjakan', [\App\Http\Controllers\RiasecTestController::class, 'store'])->name('tes-karir.store');
     Route::get('/tes-karir/hasil/{result}', [\App\Http\Controllers\RiasecTestController::class, 'show'])->name('tes-karir.result');

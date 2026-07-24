@@ -10,7 +10,7 @@ interface PublicLayoutProps {
 }
 
 export default function PublicLayout({ children, transparentNavbar = false }: PublicLayoutProps) {
-    const { auth, global_settings } = usePage().props as any;
+    const { auth, global_settings, total_visitors } = usePage().props as any;
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -178,6 +178,9 @@ export default function PublicLayout({ children, transparentNavbar = false }: Pu
                         <p className="text-white/60 mb-8 max-w-sm leading-relaxed">
                             {global_settings?.footer_about || 'Platform konseling karir teman sebaya yang menghubungkan mahasiswa dan lulusan baru dengan mentor berpengalaman.'}
                         </p>
+                        <div className="mb-8">
+                            <img src={global_settings?.footer_image || '/footer.jpeg'} alt="Logo Mitra" className="h-16 w-auto object-contain bg-white rounded-lg p-2" />
+                        </div>
                         <div className="flex gap-4">
                             {global_settings?.social_ig && (
                                 <a href={global_settings.social_ig} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 hover:bg-brand-primary flex items-center justify-center text-white/60 hover:text-white transition-colors border border-white/10">
@@ -241,7 +244,11 @@ export default function PublicLayout({ children, transparentNavbar = false }: Pu
 
                 <div className="max-w-7xl mx-auto pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-white/40 text-sm">© 2026 Karir Sebaya. All rights reserved.</p>
-                    <p className="text-white/40 text-sm flex items-center gap-1">Dibuat dengan <i className="ph-fill ph-heart text-red-500"></i> di Indonesia</p>
+                    <p className="text-white/40 text-sm flex items-center gap-2">
+                        <span>Total Pengunjung: <strong>{total_visitors ? total_visitors.toLocaleString() : 0}</strong></span>
+                        <span className="text-white/20">|</span>
+                        <span className="flex items-center gap-1">Dibuat dengan <i className="ph-fill ph-heart text-red-500"></i> di Indonesia</span>
+                    </p>
                 </div>
             </footer>
         </div>

@@ -30,7 +30,7 @@ class SettingController extends Controller
     {
         $data = $request->except(['_token', '_method']);
         
-        $fileKeys = ['panduan_file', 'navbar_icon', 'favicon'];
+        $fileKeys = ['panduan_file', 'navbar_icon', 'favicon', 'footer_image'];
 
         // Cek jika ada permintaan untuk menghapus file
         foreach ($fileKeys as $fileKey) {

@@ -85,9 +85,14 @@ export default function TesKarir({ auth, global_settings }: PageProps) {
                                     </ul>
                                     
                                     {testIsOpen ? (
-                                        <Link href={route('tes-karir.create')} className="w-full py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent text-white font-bold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
-                                            Mulai Tes Sekarang <i className="ph ph-arrow-right"></i>
-                                        </Link>
+                                        <div className="flex flex-col sm:flex-row gap-3 w-full">
+                                            <Link href={route('tes-karir.create')} className="flex-1 py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent text-white font-bold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
+                                                Mulai Tes Sekarang <i className="ph ph-arrow-right"></i>
+                                            </Link>
+                                            <Link href={route('tes-karir.history')} className="sm:w-auto py-4 px-6 rounded-xl bg-gray-100 text-brand-primary font-bold text-lg border border-gray-200 hover:bg-gray-200 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                                                <i className="ph ph-clock-counter-clockwise"></i> Riwayat Tes
+                                            </Link>
+                                        </div>
                                     ) : (
                                         <div className="w-full py-4 rounded-xl bg-gray-100 text-gray-500 font-bold text-lg text-center flex items-center justify-center gap-2 border border-gray-200">
                                             <i className="ph ph-lock-key"></i> Tes Sedang Ditutup

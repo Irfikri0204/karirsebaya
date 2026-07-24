@@ -53,7 +53,10 @@ export default function SettingsIndex({ settings }: SettingsProps) {
         test_is_open: settings.test_is_open || '0',
         stat_users_auto: settings.stat_users_auto === '1',
         stat_users_manual: settings.stat_users_manual || '',
+        stat_counselors_auto: settings.stat_counselors_auto === '1',
         stat_counselors: settings.stat_counselors || '',
+        visitor_count_auto: settings.visitor_count_auto === '1',
+        visitor_count_start: settings.visitor_count_start || '0',
         stat_careers: settings.stat_careers || '',
         about_title: settings.about_title || '',
         about_subtitle: settings.about_subtitle || '',
@@ -62,8 +65,10 @@ export default function SettingsIndex({ settings }: SettingsProps) {
         testimonial_mode: settings.testimonial_mode || 'auto',
         navbar_icon: null as File | null,
         favicon: null as File | null,
+        footer_image: null as File | null,
         remove_navbar_icon: false,
         remove_favicon: false,
+        remove_footer_image: false,
         riasec_instruction: initialRiasecInstructions as string[],
         riasec_show_figures: settings.riasec_show_figures === '1',
         footer_about: settings.footer_about || 'Platform konseling karir teman sebaya yang menghubungkan mahasiswa dan lulusan baru dengan mentor berpengalaman.',
@@ -337,17 +342,32 @@ export default function SettingsIndex({ settings }: SettingsProps) {
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Konselor Karir</label>
+                            <div className="flex flex-col gap-3 p-4 border rounded-xl bg-gray-50 mt-4">
+                                <label className="flex items-center gap-3 cursor-pointer">
                                     <input 
-                                        type="text" 
-                                        value={data.stat_counselors} 
-                                        onChange={e => setData('stat_counselors', e.target.value)}
-                                        className="w-full rounded-xl border-gray-300 focus:border-brand-primary focus:ring-brand-primary shadow-sm"
-                                        placeholder="Contoh: 50+"
+                                        type="checkbox" 
+                                        checked={data.stat_counselors_auto} 
+                                        onChange={e => setData('stat_counselors_auto', e.target.checked)}
+                                        className="rounded text-brand-primary focus:ring-brand-primary w-5 h-5"
                                     />
-                                </div>
+                                    <span className="font-bold text-gray-900">Hitung Jumlah Konselor Secara Otomatis</span>
+                                </label>
+                                <p className="text-sm text-gray-500 ml-8">Jika dicentang, akan menghitung total anggota tim dengan kategori Konselor Ahli dan Konselor Sebaya.</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6 mt-4">
+                                {!data.stat_counselors_auto && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Konselor Karir (Manual)</label>
+                                        <input 
+                                            type="text" 
+                                            value={data.stat_counselors} 
+                                            onChange={e => setData('stat_counselors', e.target.value)}
+                                            className="w-full rounded-xl border-gray-300 focus:border-brand-primary focus:ring-brand-primary shadow-sm"
+                                            placeholder="Contoh: 50+"
+                                        />
+                                    </div>
+                                )}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Pilihan Karir</label>
                                     <input 
@@ -359,6 +379,44 @@ export default function SettingsIndex({ settings }: SettingsProps) {
                                     />
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Section Pengunjung */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+                            <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                <i className="ph-fill ph-users text-brand-primary"></i> Statistik Pengunjung
+                            </h3>
+                            <p className="text-gray-500 text-sm mt-1">Atur nilai awal counter pengunjung website.</p>
+                        </div>
+                        <div className="p-6 space-y-6">
+                            <div className="flex flex-col gap-3 p-4 border rounded-xl bg-gray-50">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={data.visitor_count_auto} 
+                                        onChange={e => setData('visitor_count_auto', e.target.checked)}
+                                        className="rounded text-brand-primary focus:ring-brand-primary w-5 h-5"
+                                    />
+                                    <span className="font-bold text-gray-900">Hitung Secara Otomatis (Tanpa Rekayasa)</span>
+                                </label>
+                                <p className="text-sm text-gray-500 ml-8">Jika dicentang, angka yang tampil adalah jumlah kunjungan riil yang tercatat sistem.</p>
+                            </div>
+                            
+                            {!data.visitor_count_auto && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Nilai Awal (Start Value) Counter Pengunjung</label>
+                                    <input 
+                                        type="number" 
+                                        value={data.visitor_count_start} 
+                                        onChange={e => setData('visitor_count_start', e.target.value)}
+                                        className="w-full md:w-1/2 rounded-xl border-gray-300 focus:border-brand-primary focus:ring-brand-primary shadow-sm"
+                                        placeholder="Contoh: 1000"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-2">Total pengunjung yang tampil = Nilai Awal ini + Jumlah kunjungan riil.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -586,6 +644,40 @@ export default function SettingsIndex({ settings }: SettingsProps) {
                                     className="w-full rounded-xl border-gray-300 focus:border-brand-primary focus:ring-brand-primary shadow-sm resize-none"
                                 />
                             </div>
+
+                            <div className="pt-4 border-t border-gray-100">
+                                {settings.footer_image && !data.remove_footer_image && (
+                                    <div className="mb-4 p-4 border border-gray-200 rounded-xl bg-gray-50 flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 rounded border border-gray-200 bg-white flex items-center justify-center overflow-hidden shadow-sm px-2">
+                                                <img src={settings.footer_image} alt="Footer Image" className="h-full w-auto object-contain" />
+                                            </div>
+                                            <div>
+                                                <span className="block text-sm font-bold text-gray-800">Logo Bawah Kustom Aktif</span>
+                                                <span className="block text-xs text-gray-500 mt-0.5">Logo footer telah diganti.</span>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setData('remove_footer_image', true)}
+                                            className="text-red-500 hover:text-red-600 hover:bg-red-50 text-sm font-bold px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                                        >
+                                            Hapus Logo (Kembali ke Bawaan)
+                                        </button>
+                                    </div>
+                                )}
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Unggah Logo di Bawah Tentang Kami</label>
+                                <input 
+                                    type="file" 
+                                    accept="image/png, image/jpeg, image/webp"
+                                    onChange={e => {
+                                        setData('footer_image', e.target.files?.[0] || null);
+                                        if (e.target.files?.[0]) setData('remove_footer_image', false);
+                                    }}
+                                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand-primary hover:file:bg-brand-primary hover:file:text-white transition-all cursor-pointer"
+                                />
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Alamat Kantor / Domisili</label>
                                 <textarea 

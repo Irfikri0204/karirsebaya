@@ -31,6 +31,7 @@
         "@types/aos": "^3.0.8",
         "aos": "^2.3.4",
         "react-easy-crop": "^6.1.0",
+        "react-image-crop": "^11.1.2",
         "react-quill": "^2.0.0"
     }
 }

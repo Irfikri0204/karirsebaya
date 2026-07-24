@@ -37,6 +37,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'global_settings' => $settings,
+            'total_visitors' => (($settings['visitor_count_auto'] ?? '0') === '1') ? (int)($settings['visitor_count'] ?? 0) : (((int)($settings['visitor_count_start'] ?? 0)) + ((int)($settings['visitor_count'] ?? 0))),
             'my_testimonial' => $request->user() 
                 ? \App\Models\Testimonial::where('user_id', $request->user()->id)->first() 
                 : null,
